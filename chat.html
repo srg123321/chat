@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="messages"></div>
+    <form>
+        <input type="text" id="message">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        $(function(){
+            var ws = new WebSocket("ws://" + location.host + "/chat");
+            ws.onmessage = function(event) {
+                var data = JSON.parse(event.data);
+                var messages = $("#messages");
+                var message = $("<div>").html("<b>" + data.name + "</b>: " + data.message);
+                messages.append(message);
+            };
+
+            $("form").on("submit", function(event) {
+                event.preventDefault();
+                var name = prompt("Please enter your name:");
+                var data = {name: name, message: $("#message").val()};
+                ws.send(JSON.stringify(data));
+                $("#message").val("");
+            });
+        });
+    </script>
+</body>
+</html>
